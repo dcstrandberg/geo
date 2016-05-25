@@ -26,7 +26,7 @@ class DistCtrl {
         
         this.compassOff = function() {
             
-            navigator.geolocation.clearWatch(vm.watchID);
+            navigator.geolocation.clearWatch(this.watchID);
             vm.on = false;
 
         };
@@ -34,19 +34,35 @@ class DistCtrl {
             if (navigator.geolocation) {
                     
                 //watchPosition returns an ID for clearing it later
-                vm.watchID = navigator.geolocation.watchPosition(
+                this.watchID = navigator.geolocation.watchPosition(
                         
                     //anonymous callback function to trigger a view change
                     function(locObj) {
-                        Locations.insert({
-                            name: vm.name,
-                            geo: {
-                                lat: locObj.coords.latitude,
-                                long: locObj.coords.longitude
-                            },
-                            updated: new Date()
-                        });
-                              
+                        //If the entry for me doesn't exist yet, create one
+                        if (Locations.find({'name':vm.name}).count() === 0) {
+                            Locations.insert({
+                                'name': vm.name,
+                                'geo': {
+                                    'lat': locObj.coords.latitude,
+                                    'long': locObj.coords.longitude
+                                },
+                                'updated': new Date()
+                            });
+                        //Otherwise if the entry DOES exist, update it
+                        } else {
+                            var id = Locations.findOne({'name':vm.name})._id;
+                            Locations.update({
+                                '_id': id
+                            }, {
+                                $set: {
+                                    'geo': {
+                                        'lat': locObj.coords.latitude,
+                                        'long': locObj.coords.longitude
+                                    },
+                                    'updated': new Date()
+                                }
+                            });
+                        }   
                     }, function(err) { //Do the same if there's an error
                         vm.error = err.code + ": " + err.message;
                     }, vm.distSettings

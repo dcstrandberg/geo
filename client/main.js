@@ -1,11 +1,9 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
-import buttons from '../imports/components/buttons/buttons';
 import dist from '../imports/components/dist/dist';
 
 angular.module('geoApp', [
     angularMeteor,
-    buttons.name,
     dist.name
 ]);
 /*
