@@ -1,0 +1,15 @@
+<div id="distance"> 
+    <h1 id="demo">{{$ctrl.me.name}}: {{$ctrl.me.geo.lat}}, {{$ctrl.me.geo.long}}</h1>
+    <br/>
+    <ul ng-repeat="user in $ctrl.locations">
+        <li><h3>{{user.name}}: {{user.geo.lat}}, {{user.geo.long}}</h3></li>
+    </ul>
+    
+</div>
+<h1>{{error}}</h1>
+
+<div id="buttonbar">
+<button id="on" ng-class="{active: $ctrl.on}" ng-click="$ctrl.compassOn()">On</button>
+<!-- The following ng-class whould evaluate to true when on = false, but we'll see -->
+<button id="off" ng-class="{active: !($ctrl.on)}" ng-click="$ctrl.compassOff()">Off</button>
+</div>

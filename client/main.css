@@ -1,0 +1,64 @@
+body {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #eeeeee;
+    margin: 0px;
+    padding: 0px;
+}
+#distance {
+    width: 100%;
+    height: auto;
+    
+    position: absolute;
+    top: 60px;
+    
+    font-size: xx-large;
+    color: #000050;
+    text-align: center;
+    /*border: 2px solid red;*/
+}
+h1 {
+    width: 100%;
+    margin: auto;
+    
+    /*border: 2px solid green;*/
+}
+#distance h3 {
+    text-align: left;
+    margin-left: 100px;
+}
+#distance ul {
+    list-style-type: none;
+}
+
+#buttonbar {
+    width: 100%;
+    border-top: 3px solid #000050;
+    display: flex;
+    position: absolute;
+    bottom: 0px;
+}
+button {
+    width: 50%;
+    height: 200px;
+    border: 1px solid #000050;
+    font-size: 48px;
+    /*No double outline from browser around selected button*/
+    outline: none;
+    
+    background-color: #eeeeee;
+    color: #BB4c30;
+    
+    /*Button changes are gradual instead of instant*/
+    -webkit-transition: background-color 0.4s, color 0.4s;
+    -moz-transition: background-color 0.4s, color 0.4s;
+    transition: background-color 0.4s, color 0.4s;
+}
+/*button.inactive {
+    background-color: #eeeeee;
+    color: #BB4c30;
+}*/
+button.active {
+    background-color: #BB4c30;
+    color: #eeeeee;
+}

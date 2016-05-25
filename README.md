@@ -1,0 +1,1 @@
+Geo App will find your geolocation, and tell you the distances from you to other users.
