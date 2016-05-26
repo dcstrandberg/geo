@@ -16,6 +16,10 @@ class DistCtrl {
         
         this.name = "David";
         this.error = "";
+        this.nonDBGeo = {
+            "lat": "",
+            "long": ""
+        };
         
         this.on = false;
         this.distSettings = {
@@ -23,6 +27,52 @@ class DistCtrl {
             timeout: 4000,
             maximumAge: 0
         };
+        function geoLog(locObj) {
+            //If the entry for me doesn't exist yet, create one
+            if (Locations.find({'name':vm.name}).count() === 0) {
+                Locations.insert({
+                    'name': vm.name,
+                    'geo': {
+                        'lat': locObj.coords.latitude,
+                        'long': locObj.coords.longitude
+                    },
+                    'updated': new Date()
+                });
+                $scope.$apply( () => {
+                    vm.nonDBGeo = {
+                        'lat': locObj.coords.latitude,
+                        'long': locObj.coords.longitude
+                    };
+                });
+            //Otherwise if the entry DOES exist, update it
+            } else {
+                var id = Locations.findOne({'name':vm.name})._id;
+                Locations.update({
+                    '_id': id
+                }, {
+                    $set: {
+                        'geo': {
+                            'lat': locObj.coords.latitude,
+                            'long': locObj.coords.longitude
+                        },
+                        'updated': new Date()
+                    }
+                });
+                $scope.$apply( () => {
+                    vm.nonDBGeo = {
+                        'lat': locObj.coords.latitude,
+                        'long': locObj.coords.longitude
+                    };
+                });
+            }   
+        }
+        
+        function geoError(err) { //Do the same if there's an error
+            $scope.$apply( () => {
+                vm.error = err.code + ": " + err.message;
+            });
+            console.log("Error registered in callback function:" + err.code + ": " + err.message);
+        }
         
         this.compassOff = function() {
             
@@ -35,40 +85,15 @@ class DistCtrl {
                     
                 //watchPosition returns an ID for clearing it later
                 this.watchID = navigator.geolocation.watchPosition(
-                        
-                    //anonymous callback function to trigger a view change
-                    function(locObj) {
-                        //If the entry for me doesn't exist yet, create one
-                        if (Locations.find({'name':vm.name}).count() === 0) {
-                            Locations.insert({
-                                'name': vm.name,
-                                'geo': {
-                                    'lat': locObj.coords.latitude,
-                                    'long': locObj.coords.longitude
-                                },
-                                'updated': new Date()
-                            });
-                        //Otherwise if the entry DOES exist, update it
-                        } else {
-                            var id = Locations.findOne({'name':vm.name})._id;
-                            Locations.update({
-                                '_id': id
-                            }, {
-                                $set: {
-                                    'geo': {
-                                        'lat': locObj.coords.latitude,
-                                        'long': locObj.coords.longitude
-                                    },
-                                    'updated': new Date()
-                                }
-                            });
-                        }   
-                    }, function(err) { //Do the same if there's an error
-                        vm.error = err.code + ": " + err.message;
-                    }, vm.distSettings
+                    geoLog, 
+                    geoError, 
+                    vm.distSettings
                 );            
             } else {
-                return "Error!";
+                $scope.$apply( () => {
+                    vm.error = "Error!";
+                });
+                console.log("Error generated when seeing if 'navigator.geolocation' exists");
             }
             
             vm.on = true;

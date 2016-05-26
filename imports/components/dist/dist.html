@@ -1,12 +1,14 @@
 <div id="distance"> 
     <h1 id="demo">{{$ctrl.me.name}}: {{$ctrl.me.geo.lat}}, {{$ctrl.me.geo.long}}</h1>
+    <h1>NonDB: {{$ctrl.nonDBGeo.lat}}, {{$ctrl.nonDBGeo.long}}</h1>
+    <h1>{{$ctrl.error}}</h1>
+
     <br/>
     <ul ng-repeat="user in $ctrl.locations">
         <li ng-show="$ctrl.on"><h3>{{user.name}}: {{user.geo.lat}}, {{user.geo.long}}</h3></li>
     </ul>
     
 </div>
-<h1>{{error}}</h1>
 
 <div id="buttonbar">
 <button id="on" ng-class="{active: $ctrl.on}" ng-click="$ctrl.compassOn()">On</button>
