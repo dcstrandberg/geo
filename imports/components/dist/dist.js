@@ -2,12 +2,12 @@ import angular from 'angular';
 import angularMeteor from 'angular-meteor';
 
 import { Locations } from '../../api/locations.js';
-//import buttons from '../buttons/buttons.js';
+import DistService from '../../services/distService.js';
 
 import template from './dist.html';
 
 class DistCtrl {
-    constructor($scope) {
+    constructor($scope, distService) {
         //'ngInject';
         
         //$reactive(this).attach($scope);
@@ -15,93 +15,33 @@ class DistCtrl {
         var vm = this;
         
         this.name = "David";
-        this.error = "";
-        this.nonDBGeo = {
+        this.error = distService.errMsg;
+        /*this.nonDBGeo = {
             "lat": "",
             "long": ""
-        };
-        
+        };*/
         this.on = false;
-        this.distSettings = {
-            enableHighAccuracy: true,
-            timeout: 4000,
-            maximumAge: 0
-        };
-        function geoLog(locObj) {
-            //If the entry for me doesn't exist yet, create one
-            if (Locations.find({'name':vm.name}).count() === 0) {
-                Locations.insert({
-                    'name': vm.name,
-                    'geo': {
-                        'lat': locObj.coords.latitude,
-                        'long': locObj.coords.longitude
-                    },
-                    'updated': new Date()
-                });
-                $scope.$apply( () => {
-                    vm.nonDBGeo = {
-                        'lat': locObj.coords.latitude,
-                        'long': locObj.coords.longitude
-                    };
-                });
-            //Otherwise if the entry DOES exist, update it
-            } else {
-                var id = Locations.findOne({'name':vm.name})._id;
-                Locations.update({
-                    '_id': id
-                }, {
-                    $set: {
-                        'geo': {
-                            'lat': locObj.coords.latitude,
-                            'long': locObj.coords.longitude
-                        },
-                        'updated': new Date()
-                    }
-                });
-                $scope.$apply( () => {
-                    vm.nonDBGeo = {
-                        'lat': locObj.coords.latitude,
-                        'long': locObj.coords.longitude
-                    };
-                });
-            }   
-        }
-        
-        function geoError(err) { //Do the same if there's an error
-            $scope.$apply( () => {
-                vm.error = err.code + ": " + err.message;
-            });
-            console.log("Error registered in callback function:" + err.code + ": " + err.message);
-        }
-        
+                
         this.compassOff = function() {
-            
-            navigator.geolocation.clearWatch(this.watchID);
+            //Use the service to clear the geo watch
+            distService.clearGeo(this.watchID);
             vm.on = false;
+            vm.error = distService.errMsg;            
 
         };
         this.compassOn = function() {
-            if (navigator.geolocation) {
-                    
-                //watchPosition returns an ID for clearing it later
-                this.watchID = navigator.geolocation.watchPosition(
-                    geoLog, 
-                    geoError, 
-                    vm.distSettings
-                );            
-            } else {
-                $scope.$apply( () => {
-                    vm.error = "Error!";
-                });
-                console.log("Error generated when seeing if 'navigator.geolocation' exists");
-            }
+            //Call the distService to get the geo Obj
+            //Pass it the username of the current user
+            distService.getGeo(this.name);
             
+            //Update variables
             vm.on = true;
+            vm.error = distService.errMsg;            
         };
 
         
         this.helpers({
-            me() {
+            me() { 
                 if (Locations.findOne({name: vm.name}) && vm.on) {
                     return Locations.findOne({name: vm.name});
                 } else {
@@ -114,7 +54,7 @@ class DistCtrl {
                     };
                 }
             },
-            locations() {
+            locations() { //Should return distance and not lat/long - Eventually the distance calculations will be performed on the server, which should be more secure...
                 return Locations.find({
                     'name': {
                         $ne: vm.name
@@ -158,7 +98,9 @@ class DistCtrl {
 
 export default angular.module('dist', [
     angularMeteor
-]).component('dist', {
+]).factory('distService', 
+    DistService
+).component('dist', {
     templateUrl: 'imports/components/dist/dist.html',
-    controller: ['$scope', DistCtrl]
+    controller: ['$scope', 'distService', DistCtrl]
 });
