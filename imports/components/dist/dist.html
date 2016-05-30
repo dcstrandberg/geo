@@ -4,8 +4,12 @@
     <h1>{{$ctrl.error}}</h1>
 
     <br/>
-    <ul ng-repeat="user in $ctrl.locations">
-        <li ng-show="$ctrl.on"><h3>{{user.name}}: {{user.geo.lat}}, {{user.geo.long}}</h3></li>
+    <ul ng-repeat="list in $ctrl.distances">
+        <ul ng-repeat="user in list.distList">
+            <li ng-show="$ctrl.on">
+                <h3>{{user.name}}: {{user.distance}}</h3>
+            </li>
+        </ul>
     </ul>
     
 </div>

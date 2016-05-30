@@ -54,10 +54,9 @@ button {
     -moz-transition: background-color 0.4s, color 0.4s;
     transition: background-color 0.4s, color 0.4s;
 }
-/*button.inactive {
-    background-color: #eeeeee;
-    color: #BB4c30;
-}*/
+button:hover {
+    background-color: #FFCcA0;
+}
 button.active {
     background-color: #BB4c30;
     color: #eeeeee;
