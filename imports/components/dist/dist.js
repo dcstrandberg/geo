@@ -16,10 +16,6 @@ class DistCtrl {
         
         this.name = "David";
         this.error = distService.errMsg;
-        /*this.nonDBGeo = {
-            "lat": "",
-            "long": ""
-        };*/
         this.on = false;
                 
         this.compassOff = function() {
@@ -59,13 +55,6 @@ class DistCtrl {
                         }
                     };
                 }
-            },
-            locations() {//Should be able to get rid of this helper now...
-                return Locations.find({
-                    'name': {
-                        $ne: vm.name
-                    }
-                });
             },
             distances() {//Use the Locations helper and the Me helper to compute distances
                 if (vm.getReactively('on')) {

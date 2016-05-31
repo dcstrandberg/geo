@@ -25,10 +25,17 @@ h1 {
 }
 #distance h3 {
     text-align: left;
+    margin: 0;
+    padding: 20px;
     margin-left: 100px;
+    
+    -webkit-transition: background-color 0.4s;
+    -moz-transition: background-color 0.4s;
+    transition: background-color 0.4s;
 }
 #distance ul {
     list-style-type: none;
+    margin: 0;
 }
 
 #buttonbar {

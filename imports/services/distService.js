@@ -1,3 +1,5 @@
+import angular from 'angular';
+import angularMeteor from 'angular-meteor';
 import { Locations } from '../api/locations.js';
 
 function DistService() {
@@ -41,33 +43,15 @@ function DistService() {
         
         //CALLBACK FUNCTIONS
         function geoLog(locObj) {
-            //Can we talk to the database inside this service?! We'll find out
-            
-            //If the entry for me doesn't exist yet, create one
-            if (Locations.find({'name':name}).count() === 0) {
-                Locations.insert({
-                    'name': name,
-                    'geo': {
-                        'lat': locObj.coords.latitude,
-                        'long': locObj.coords.longitude
-                    },
-                    'updated': new Date()
-                });
-            //Otherwise if the entry DOES exist, update it
-            } else {
-                var id = Locations.findOne({'name':name})._id;
-                Locations.update({
-                    '_id': id
-                }, {
-                    $set: {
-                        'geo': {
-                            'lat': locObj.coords.latitude,
-                            'long': locObj.coords.longitude
-                        },
-                        'updated': new Date()
-                    }
-                });
-            }
+            //Define a user object to pass to the Meteor Method
+            userObj = {
+                'name': name,
+                'geo': {
+                    'lat': locObj.coords.latitude,
+                    'long': locObj.coords.longitude
+                }
+            };
+            Meteor.call('locations.setLocation', userObj);
             createDistList(); 
             return "";  
         }
@@ -79,57 +63,12 @@ function DistService() {
             console.log("Error registered in callback function:" + err.code + ": " + err.message);
             this.errMsg = "Error registered in callback function:" + err.code + ": " + err.message;
         }
-
-        //Turned back into a non-method function
-        function computeDist(myGeo, userGeo) {
-            //enclosed function to accept the geolocation object and update the display accordingly
-            const EARTHRADIUS = 6371; //Kilometers
-            var myLat = myGeo.lat, myLong = myGeo.long;
-            //var HOMELAT = 42, HOMELONG = -93;
-            
-            var dist;  
-                     
-            //Get the location coordinates
-            var lat0 = userGeo.lat;
-            var long0 = userGeo.long;
         
-            //Get the differences in lat and long and convert to radians
-            var deltaLat = (myLat - lat0) * Math.PI / 180;
-            var deltaLong = (myLong - long0) * Math.PI / 180;
-        
-            var a = 
-                0.5 - Math.cos(deltaLat)/2 + 
-                Math.cos(lat0 * Math.PI / 180) * Math.cos(myLat * Math.PI / 180) * (1 - Math.cos(deltaLong))/2;
-            //Round the distance to 1 decimal point
-            var dist = 
-                (EARTHRADIUS * 2 * Math.asin( Math.sqrt(a) ) ); //Got rid of toFixed because an angularjs filter can do the same thing in HTML
-            //Add the units
-            return Number( dist );//Make sure to return a # for sorting purposes
-        }
         function createDistList() {
-            var distList = [], i; 
-            var myEntry = Locations.findOne({"name": name});
-            var userArray = Locations.find({
-                'name': {
-                    $ne: name
-                }
-            });
-            userArray.forEach(function(user) {
-                distList.push({
-                    'name': user.name,
-                    'distance': computeDist(myEntry.geo, user.geo),
-                    'matched': false
-                });
-            });
-            Locations.update({
-                "_id": myEntry._id
-            }, {
-                //Should change this to only update the entries in the distList that need to be updated
-                $set: {
-                    'distList': distList
-                }
-            });
-            return;
+            //Call the Meteor Method to generate and write the distList
+            //Pass it with the parameter of the current user's name
+            Meteor.call('locations.createDistList', name);
+            return "";
         }
         
     //Return the service object
