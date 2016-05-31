@@ -9,10 +9,15 @@
     <br/>
     
     <!--I could actually break this up into two components now since each just reads the database. But would that slow things down?-->
-    <ul ng-repeat="list in $ctrl.distances">
-        <ul ng-repeat="user in list.distList | orderBy:'distance'">
+    <ul ng-repeat="currentUser in $ctrl.distances">
+        <ul ng-repeat="user in currentUser.distList | orderBy:'distance'">
             <li ng-show="$ctrl.on">
-                <h3>{{user.name}}: {{user.distance | number:1}} km</h3>
+                <h3 ng-class="{matched: user.matched}">
+                    <input type="checkbox" 
+                        ng-checked="user.matched"   
+                        ng-click="$ctrl.matchUser(currentUser, user)"
+                    />
+                    {{user.name}}: {{user.distance | number:1}} km</h3>
             </li>
         </ul>
     </ul>

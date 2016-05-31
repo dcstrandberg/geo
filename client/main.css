@@ -61,3 +61,8 @@ button.active {
     background-color: #BB4c30;
     color: #eeeeee;
 }
+.matched {
+    text-decoration: line-through;
+    background-color: #FFCcA0;
+    border-bottom: 2px solid #BB4c30;
+}

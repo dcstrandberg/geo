@@ -117,7 +117,8 @@ function DistService() {
             userArray.forEach(function(user) {
                 distList.push({
                     'name': user.name,
-                    'distance': computeDist(myEntry.geo, user.geo)
+                    'distance': computeDist(myEntry.geo, user.geo),
+                    'matched': false
                 });
             });
             Locations.update({

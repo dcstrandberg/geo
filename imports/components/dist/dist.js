@@ -39,11 +39,17 @@ class DistCtrl {
             vm.error = this.getReactively('distService.errMsg');            
         };
         
+        this.matchUser = function(currentUser, user) {
+            //Add the matched property to the user in distList
+            //Call a meteor method to do it server-side
+            Meteor.call('locations.matchUser', currentUser, user);
+        };
+        
         this.helpers({
             me() { 
-                if (Locations.findOne({name: vm.name}) && 
+                if (Locations.findOne({'name': vm.name}) && 
                     vm.getReactively('on')) {
-                    return Locations.findOne({name: vm.name});
+                    return Locations.findOne({'name': vm.name});
                 } else {
                     return {
                         'name': vm.name, 
