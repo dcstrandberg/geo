@@ -54,7 +54,7 @@ class DistCtrl {
                     };
                 }
             },
-            locations() { //Should return distance and not lat/long - Eventually the distance calculations will be performed on the server, which should be more secure...??
+            locations() {//Should be able to get rid of this helper now...
                 return Locations.find({
                     'name': {
                         $ne: vm.name
@@ -68,7 +68,7 @@ class DistCtrl {
                         });
                         
                 } else {
-                    return;
+                    return "";
                 }
             }          
         });

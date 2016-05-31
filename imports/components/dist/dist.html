@@ -1,13 +1,18 @@
 <div id="distance"> 
-    <h1 id="demo">{{$ctrl.me.name}}: {{$ctrl.me.geo.lat}}, {{$ctrl.me.geo.long}}</h1>
+    <h1 id="demo">{{$ctrl.me.name}}: 
+        {{$ctrl.me.geo.lat | number:2}}&deg;N, 
+        {{$ctrl.me.geo.long | number:2}}&deg;W
+    </h1>
     <!--<h1>NonDB: {{$ctrl.nonDBGeo.lat}}, {{$ctrl.nonDBGeo.long}}</h1>-->
     <h1>{{$ctrl.error}}</h1>
 
     <br/>
+    
+    <!--I could actually break this up into two components now since each just reads the database. But would that slow things down?-->
     <ul ng-repeat="list in $ctrl.distances">
-        <ul ng-repeat="user in list.distList">
+        <ul ng-repeat="user in list.distList | orderBy:'distance'">
             <li ng-show="$ctrl.on">
-                <h3>{{user.name}}: {{user.distance}}</h3>
+                <h3>{{user.name}}: {{user.distance | number:1}} km</h3>
             </li>
         </ul>
     </ul>

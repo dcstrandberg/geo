@@ -80,10 +80,10 @@ function DistService() {
             this.errMsg = "Error registered in callback function:" + err.code + ": " + err.message;
         }
 
-        //ORIGINALLY THIS WAS GOING TO JUST BE A NON OBJECT FUNCTION, BUT SINCE IT NEEDS TO BE CALLED FROM THE COMPONENT, FOR NOW IT WILL BE MADE INTO A METHOD.
-        this.computeDist = function (myGeo, userGeo) {
+        //Turned back into a non-method function
+        function computeDist(myGeo, userGeo) {
             //enclosed function to accept the geolocation object and update the display accordingly
-            const EARTHRADIUS = 6371000; //Meters
+            const EARTHRADIUS = 6371; //Kilometers
             var myLat = myGeo.lat, myLong = myGeo.long;
             //var HOMELAT = 42, HOMELONG = -93;
             
@@ -102,10 +102,10 @@ function DistService() {
                 Math.cos(lat0 * Math.PI / 180) * Math.cos(myLat * Math.PI / 180) * (1 - Math.cos(deltaLong))/2;
             //Round the distance to 1 decimal point
             var dist = 
-                (EARTHRADIUS * 2 * Math.asin( Math.sqrt(a) ) ).toFixed(1);
+                (EARTHRADIUS * 2 * Math.asin( Math.sqrt(a) ) ); //Got rid of toFixed because an angularjs filter can do the same thing in HTML
             //Add the units
-            return dist + " m";
-        };
+            return Number( dist );//Make sure to return a # for sorting purposes
+        }
         function createDistList() {
             var distList = [], i; 
             var myEntry = Locations.findOne({"name": name});
@@ -117,7 +117,7 @@ function DistService() {
             userArray.forEach(function(user) {
                 distList.push({
                     'name': user.name,
-                    'distance': vm.computeDist(myEntry.geo, user.geo)
+                    'distance': computeDist(myEntry.geo, user.geo)
                 });
             });
             Locations.update({
