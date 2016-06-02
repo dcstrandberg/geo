@@ -1,5 +1,6 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
+import { Meteor } from 'meteor/meteor';
 
 import { Locations } from '../../api/locations.js';
 import DistService from '../../services/distService.js';
@@ -14,13 +15,13 @@ class DistCtrl {
         $scope.viewModel(this);
         var vm = this;
         
-        this.name = "David";
+        //this.UID = this.getReactively('Meteor.userId()');//I wanted to only call Meteor.userId() once, but it wasn't reactively updating this variable.
         this.error = distService.errMsg;
         this.on = false;
                 
         this.compassOff = function() {
             //Use the service to clear the geo watch
-            distService.clearGeo(this.watchID);
+            distService.clearGeo();
             vm.on = false;
             vm.error = this.getReactively('distService.errMsg');            
 
@@ -28,10 +29,10 @@ class DistCtrl {
         this.compassOn = function() {
             //Call the distService to get the geo Obj
             //Pass it the username of the current user
-            distService.getGeo(this.name);
+            distService.getGeo(); //PASS THE USERID INSTEAD OF vm.name
             
             //Update variables
-            vm.on = true;
+            vm.on = true; //I SHOULD MAKE THIS UPDATE ONCE I'M SURE THE DATABASE IS FRESH, OR I SHOULD NOT HAVE THE HELPERS FUNCTION DEPEND ON vm.on
             vm.error = this.getReactively('distService.errMsg');            
         };
         
@@ -43,29 +44,42 @@ class DistCtrl {
         
         this.helpers({
             me() { 
-                if (Locations.findOne({'name': vm.name}) && 
-                    vm.getReactively('on')) {
-                    return Locations.findOne({'name': vm.name});
+                if ( this.getReactively('loggedInUser') ) {//If the user's logged in show stuff
+                    if (Locations.findOne({ 'UID': Meteor.userId() }) && 
+                        vm.getReactively('on') ) {
+                        return Locations.findOne({ 'UID': Meteor.userId() });
+                    } else {
+                        return {
+                            'name': Meteor.user().username, 
+                            'geo': {
+                                'lat': '...', 
+                                'long': '...'
+                            }
+                        };
+                    }
                 } else {
                     return {
-                        'name': vm.name, 
+                        'name': "Please Log In",
                         'geo': {
-                            'lat': '...', 
+                            'lat': '...',
                             'long': '...'
                         }
                     };
                 }
             },
             distances() {//Use the Locations helper and the Me helper to compute distances
-                if (vm.getReactively('on')) {
+               // if (vm.getReactively('on')) {
                     return Locations.find({
-                        'name': vm.name
+                        'UID': Meteor.userId()
                         });
                         
-                } else {
+                /*} else {
                     return "";
-                }
-            }          
+                }*/
+            },
+            loggedInUser() {//Only used right now to only show distances if the user's logged in
+                return Meteor.user();
+            } 
         });
     }
 }

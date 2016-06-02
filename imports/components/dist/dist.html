@@ -3,13 +3,13 @@
         {{$ctrl.me.geo.lat | number:2}}&deg;N, 
         {{$ctrl.me.geo.long | number:2}}&deg;W
     </h1>
-    <!--<h1>NonDB: {{$ctrl.nonDBGeo.lat}}, {{$ctrl.nonDBGeo.long}}</h1>-->
+    <!--<h4>Updated: {{ ((new Date - $ctrl.me.updated)/1000) }}s ago</h4>-->
     <h1>{{$ctrl.error}}</h1>
 
     <br/>
     
     <!--I could actually break this up into two components now since each just reads the database. But would that slow things down?-->
-    <ul ng-repeat="currentUser in $ctrl.distances">
+    <ul ng-repeat="currentUser in $ctrl.distances" ng-show="$ctrl.loggedInUser">
         <ul ng-repeat="user in currentUser.distList | orderBy:'distance'">
             <li ng-show="$ctrl.on">
                 <h3 ng-class="{matched: user.matched}">
@@ -17,7 +17,9 @@
                         ng-checked="user.matched"   
                         ng-click="$ctrl.matchUser(currentUser, user)"
                     />
-                    {{user.name}}: {{user.distance | number:1}} km</h3>
+                    {{user.name}}: {{user.distance | number:1}} km
+                    <!--  - Updated: {{ ((new Date - user.lastActive)/1000) }}s ago-->
+                </h3>
             </li>
         </ul>
     </ul>

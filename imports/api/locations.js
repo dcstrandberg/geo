@@ -11,7 +11,7 @@ Meteor.methods({
         
         Locations.update({
             '_id': currentUser._id,
-            'distList.name': userObj.name
+            'distList.UID': userObj.UID
         }, { 
             $set: {
                 //Toggle the matched property in the distList
@@ -23,14 +23,14 @@ Meteor.methods({
         check(userObj, Object);
         
         //If the entry for me doesn't exist yet, create one
-        if (Locations.find({'name':userObj.name}).count() === 0) {
+        if (Locations.find({'UID':userObj.UID}).count() === 0) {
             //Add date modified property
             userObj.updated = new Date;
             //Insert the document into the database            
             Locations.insert(userObj);
         } else {
             //If the entry *does* exist:
-            var id = Locations.findOne({'name':userObj.name})._id;
+            var id = Locations.findOne({'UID':userObj.UID})._id;
             Locations.update({
                 '_id': id
             }, {
@@ -44,20 +44,21 @@ Meteor.methods({
             });
         }    
     },
-    'locations.createDistList' (currentName) {
-        check(currentName, String);
+    'locations.createDistList' (userID) {
+        check(userID, String);
         
         var distList = []; 
-        var myEntry = Locations.findOne({"name": currentName});
+        var myEntry = Locations.findOne({"UID": userID});
         var userArray = Locations.find({
-            'name': {
-                $ne: currentName
+            'UID': {
+                $ne: userID
             }
         });
         //For each user document in the DB that's not the current user
         //Add their name, distance, and matched=false info to the distList array
         userArray.forEach(function(user) {
             distList.push({
+                'UID': user.UID,
                 'name': user.name,
                 'distance': computeDist(myEntry.geo, user.geo),
                 'matched': false,

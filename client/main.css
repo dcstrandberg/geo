@@ -17,7 +17,7 @@ body {
     text-align: center;
     /*border: 2px solid red;*/
 }
-h1 {
+h1, h4 {
     width: 100%;
     margin: auto;
     
@@ -73,3 +73,6 @@ button.active {
     background-color: #FFCcA0;
     border-bottom: 2px solid #BB4c30;
 }
+/*login-buttons {
+  
+}*/

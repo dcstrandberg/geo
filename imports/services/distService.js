@@ -4,7 +4,7 @@ import { Locations } from '../api/locations.js';
 
 function DistService() {
     var vm = this;
-        var name; //Maybe the USERID would be better
+        //var userId; //Getting rid of this because I'm just calling Meteor.userId() directly rather than getting it passed. I might even end up just calling it in the database methods...
         var distSettings = { //Settings for grabbing the geolocation obj
             enableHighAccuracy: true,
             timeout: 4000,
@@ -15,9 +15,9 @@ function DistService() {
         this.errMsg = "";
  
         //When On is clicked, this method finds the geo obj
-        this.getGeo = (user) => {
+        this.getGeo = () => {
             //First assign the name variable so we can use it in the callback functions
-            name = user;
+            //userId = UID;
             
             if (navigator.geolocation) {
                 //watchPosition returns an ID for clearing it later
@@ -45,7 +45,8 @@ function DistService() {
         function geoLog(locObj) {
             //Define a user object to pass to the Meteor Method
             userObj = {
-                'name': name,
+                'UID': Meteor.userId(),
+                'name': Meteor.user().username,
                 'geo': {
                     'lat': locObj.coords.latitude,
                     'long': locObj.coords.longitude
@@ -67,7 +68,7 @@ function DistService() {
         function createDistList() {
             //Call the Meteor Method to generate and write the distList
             //Pass it with the parameter of the current user's name
-            Meteor.call('locations.createDistList', name);
+            Meteor.call('locations.createDistList', Meteor.userId() );
             return "";
         }
         
