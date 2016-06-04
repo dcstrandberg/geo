@@ -17,8 +17,7 @@
                         ng-checked="user.matched"   
                         ng-click="$ctrl.matchUser(currentUser, user)"
                     />
-                    {{user.name}}: {{user.distance | number:1}} km
-                    <!--  - Updated: {{ ((new Date - user.lastActive)/1000) }}s ago-->
+                    {{user.name}}: {{user.distance | number:1}} km <last-updated updated="user.lastActive"></last-updated>
                 </h3>
             </li>
         </ul>

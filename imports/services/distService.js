@@ -37,6 +37,7 @@ function DistService() {
         //When Off is clicked this method gets called
         this.clearGeo = () => {
             navigator.geolocation.clearWatch(watchID);
+            Meteor.call('locations.clearDistList');
         };        
         
         

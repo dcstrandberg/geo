@@ -1,6 +1,7 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
 import { Meteor } from 'meteor/meteor';
+import lastUpdated from '../lastUpdated/lastUpdated.js';
 
 import { Locations } from '../../api/locations.js';
 import DistService from '../../services/distService.js';
@@ -20,20 +21,23 @@ class DistCtrl {
         this.on = false;
                 
         this.compassOff = function() {
-            //Use the service to clear the geo watch
-            distService.clearGeo();
-            vm.on = false;
-            vm.error = this.getReactively('distService.errMsg');            
-
+            if (vm.on === true) {//Only do a thing if we're currently On
+                //Use the service to clear the geo watch
+                distService.clearGeo();
+                vm.on = false;
+                vm.error = this.getReactively('distService.errMsg');            
+            }
         };
         this.compassOn = function() {
-            //Call the distService to get the geo Obj
-            //Pass it the username of the current user
-            distService.getGeo(); //PASS THE USERID INSTEAD OF vm.name
+            if (vm.on === false) {//Only do a thing if we're currently Off
+                //Call the distService to get the geo Obj
+                //Pass it the username of the current user
+                distService.getGeo(); //PASS THE USERID INSTEAD OF vm.name
             
-            //Update variables
-            vm.on = true; //I SHOULD MAKE THIS UPDATE ONCE I'M SURE THE DATABASE IS FRESH, OR I SHOULD NOT HAVE THE HELPERS FUNCTION DEPEND ON vm.on
-            vm.error = this.getReactively('distService.errMsg');            
+                //Update variables
+                vm.on = true; //I SHOULD MAKE THIS UPDATE ONCE I'M SURE THE DATABASE IS FRESH, OR I SHOULD NOT HAVE THE HELPERS FUNCTION DEPEND ON vm.on
+                vm.error = this.getReactively('distService.errMsg');            
+            }
         };
         
         this.matchUser = function(currentUser, user) {
@@ -85,7 +89,8 @@ class DistCtrl {
 }
 
 export default angular.module('dist', [
-    angularMeteor
+    angularMeteor,
+    lastUpdated.name
 ]).factory('distService', 
     DistService
 ).component('dist', {

@@ -75,6 +75,17 @@ Meteor.methods({
             }
         });
         
+    },
+    'locations.clearDistList' () {
+        var myEntry = Locations.findOne({"UID": Meteor.userId()});
+
+        Locations.update({
+            '_id': myEntry._id
+        }, {
+            $set: {
+                'distList': [] //Empty the distList
+            }            
+        });
     }
 });
 //Define the function so that the server can compute the distance

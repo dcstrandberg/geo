@@ -12,6 +12,9 @@ body {
     position: absolute;
     top: 60px;
     
+    overflow-y: auto;
+    overflow-x: visible;
+    
     font-size: xx-large;
     color: #000050;
     text-align: center;
@@ -25,6 +28,7 @@ h1, h4 {
 }
 #distance h3 {
     text-align: left;
+
     margin: 0;
     padding: 20px;
     margin-left: 100px;
@@ -42,8 +46,10 @@ h1, h4 {
     width: 100%;
     border-top: 3px solid #000050;
     display: flex;
+    
     position: absolute;
     bottom: 0px;
+    margin-top: 20px;
 }
 button {
     width: 50%;
@@ -72,6 +78,16 @@ button.active {
     text-decoration: line-through;
     background-color: #FFCcA0;
     border-bottom: 2px solid #BB4c30;
+}
+last-updated {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin-left: auto;
+    
+    /*text-align: right;*/
+    opacity: 0.8;
+    font-size: 12px;
 }
 /*login-buttons {
   
