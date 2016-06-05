@@ -1,27 +1,29 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
 import { Meteor } from 'meteor/meteor';
-import lastUpdated from '../lastUpdated/lastUpdated.js';
 
+import lastUpdated from '../lastUpdated/lastUpdated.js';
 import { Locations } from '../../api/locations.js';
 import DistService from '../../services/distService.js';
 
 import template from './dist.html';
 
 class DistCtrl {
-    constructor($scope, distService) {
+    constructor($scope, distService, $window) {
         //'ngInject';
         
         //$reactive(this).attach($scope);
         $scope.viewModel(this);
         var vm = this;
+        //Subscribe to the tasks
+        this.subscribe('locations');
         
-        //this.UID = this.getReactively('Meteor.userId()');//I wanted to only call Meteor.userId() once, but it wasn't reactively updating this variable.
         this.error = distService.errMsg;
         this.on = false;
                 
         this.compassOff = function() {
-            if (vm.on === true && Meteor.userId()) {//Only do a thing if we're currently On & the user's logged in
+            if (vm.on === true) {//Only do a thing if we're currently On
+            //IT USED TO REQUIRE A LOGGED IN USER AS WELL, BUT I DON'T SEE WHAT EXTRA SAFETY THAT PROVIDES.... I'll THINK ABOUT IT
                 //Use the service to clear the geo watch
                 distService.clearGeo();
                 vm.on = false;
@@ -84,9 +86,18 @@ class DistCtrl {
             loggedInUser() {//Only used right now to show distances only if the user's logged in
                 return Meteor.user();
             } 
+        });//End of helpers
+        //When the page gets reloaded or closed, run the OFF function
+        $scope.$on('$destroy', function() {
+            if (vm.on) {
+                distService.clearGeo();
+            }
         });
-    }
-}
+        $window.onbeforeunload = function(evt) {
+            vm.compassOff();
+        }
+    }//End of constructor
+}//End of class
 
 export default angular.module('dist', [
     angularMeteor,
@@ -95,5 +106,5 @@ export default angular.module('dist', [
     DistService
 ).component('dist', {
     templateUrl: 'imports/components/dist/dist.html',
-    controller: ['$scope', 'distService', DistCtrl]
+    controller: ['$scope', 'distService', '$window', DistCtrl]
 });

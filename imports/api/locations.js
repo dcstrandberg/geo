@@ -4,6 +4,19 @@ import { check } from 'meteor/check';
 
 export const Locations = new Mongo.Collection('locations');
 
+if (Meteor.isServer) {
+    //This code only runs on the server
+    Meteor.publish('locations', function locationsPublication() {
+        return Locations.find({//I COULD MODIFY THIS SO THAT ONLY THE DISTLIST GETS PUBLISHED AND THEN THE CURRENT GEO OBJECT COULD JUST BE FED TO THE VIEW FROM THE DISTSERVICE INSTEAD OF FROM THE DB. THAT MIGHT BE SAFER SO THAT NEVER DOES THE CONTROLLER READ THE GEO OBJECT FROM THE DB. INSTEAD IT JUST GETS THE DISTANCES...
+            UID: this.userId
+        }/*,{
+            distList: true //This would only return the distList of the entyr, but currently we need the full entry, so I've commented it out
+        }
+        */);
+        //Publish only the logged in user's entry
+    });
+}
+
 Meteor.methods({
     'locations.matchUser' (currentUser, userObj) {
         check(userObj, Object);

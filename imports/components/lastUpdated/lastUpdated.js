@@ -11,10 +11,8 @@ class LastUpdated {
         $scope.viewModel(this);
         var vm = this;
         var sec = ( (new Date() - this.updated) / 1000 );
-        //console.log("First sec assignment: " + sec);
-        //console.log("First this.updated: " + this.updated);
-        this.suffix = getSuffix(); //this.getReactively('getSuffix()');
-        this.lastUpdated = getDate(); //this.getReactively('getDate()');
+        this.suffix = getSuffix(); 
+        this.lastUpdated = getDate(); 
         
         $scope.$on('$destroy', function() {//I'd like to eventually change the $scope to this
             if (angular.isDefined(stop)) {
@@ -23,16 +21,10 @@ class LastUpdated {
             }
         });
                 
-        var stop = $interval(function() {//Interval function doesn't appear to be updating sec (or it's making it NaN...)
-        //The view doesn't update either. EVen when changing from off to on, which should update the distList. So either the distList update isn't registering when the binding passes it in (which is certainly possible)
-        //OR sec's not being updated, which is prevening the assignments from running properly? Maybe the interval thing isn't running...
+        var stop = $interval(function() {
             sec = ( (new Date() - vm.updated) / 1000 );
-            //console.log("Sec = " + sec); 
-            //console.log("This.updated: " + vm.updated);
             vm.suffix = getSuffix();
-            //console.log("Suffix: " + vm.suffix);
             vm.lastUpdated = getDate();   
-            //console.log("Date: " + vm.lastUpdated);
         }, 60000);//Run every minute
         
         function getSuffix() {
@@ -41,7 +33,7 @@ class LastUpdated {
             } else if (sec >= 60 && sec < 300) {
                 return "A few minutes ago";
             } else if (sec >= 300 && sec < 3600) {
-                return " minutes ago";
+                return " minutes ago";//STILL HAS PROBLEMS WITH 1 (i.e. 1 hours ago)
             } else if (sec >= 3600 && (sec/3600) < 24) {
                 return " hours ago";
             } else if ((sec/3600) >= 24 && (sec/3600/24) < 7) {

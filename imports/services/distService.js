@@ -1,6 +1,7 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
-import { Locations } from '../api/locations.js';
+//import { Locations } from '../api/locations.js';
+//I don't think we need this anymore since we just call the methods...
 
 function DistService() {
     var vm = this;
