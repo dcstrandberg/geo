@@ -8,84 +8,99 @@ Meteor.methods({
     'locations.matchUser' (currentUser, userObj) {
         check(userObj, Object);
         check(currentUser, Object);
-        
-        Locations.update({
-            '_id': currentUser._id,
-            'distList.UID': userObj.UID
-        }, { 
-            $set: {
-                //Toggle the matched property in the distList
-                'distList.$.matched': !userObj.matched
-            }
-        });
+        //Only perform method if the user sending the request is the same one that's logged in. 
+        if (currentUser.UID === Meteor.userId()) {
+            Locations.update({
+                '_id': currentUser._id,
+                'distList.UID': userObj.UID
+            }, { 
+                $set: {
+                    //Toggle the matched property in the distList
+                    'distList.$.matched': !userObj.matched
+                }
+            });
+        } else {
+            console.log("Error: Cannot Match User. You are not the current user.")
+        }
     },
     'locations.setLocation' (userObj) {
         check(userObj, Object);
-        
-        //If the entry for me doesn't exist yet, create one
-        if (Locations.find({'UID':userObj.UID}).count() === 0) {
-            //Add date modified property
-            userObj.updated = new Date;
-            //Insert the document into the database            
-            Locations.insert(userObj);
+
+        if (userObj.UID === Meteor.userId()) {//Make sure the userObj passed and the logged in user are the same user
+            //If the entry for me doesn't exist yet, create one
+            if (Locations.find({'UID':userObj.UID}).count() === 0) {
+                //Add date modified property
+                userObj.updated = new Date;
+                //Insert the document into the database            
+                Locations.insert(userObj);
+            } else {
+                //If the entry *does* exist:
+                var id = Locations.findOne({'UID':userObj.UID})._id;
+                Locations.update({
+                    '_id': id
+                }, {
+                    $set: {
+                        'geo': {
+                            'lat': userObj.geo.lat,
+                            'long': userObj.geo.long
+                        },
+                        'updated': new Date()
+                    }
+                });
+            }
         } else {
-            //If the entry *does* exist:
-            var id = Locations.findOne({'UID':userObj.UID})._id;
-            Locations.update({
-                '_id': id
-            }, {
-                $set: {
-                    'geo': {
-                        'lat': userObj.geo.lat,
-                        'long': userObj.geo.long
-                    },
-                    'updated': new Date()
-                }
-            });
+            console.log("Error: Cannot set location. User mismatch.");
         }    
     },
     'locations.createDistList' (userID) {
         check(userID, String);
         
-        var distList = []; 
-        var myEntry = Locations.findOne({"UID": userID});
-        var userArray = Locations.find({
-            'UID': {
-                $ne: userID
-            }
-        });
-        //For each user document in the DB that's not the current user
-        //Add their name, distance, and matched=false info to the distList array
-        userArray.forEach(function(user) {
-            distList.push({
-                'UID': user.UID,
-                'name': user.name,
-                'distance': computeDist(myEntry.geo, user.geo),
-                'matched': false,
-                'lastActive': user.updated
+        if (userID === Meteor.userId()){//Make sure logged in user is the one we're generating the distList for. 
+            var distList = []; 
+            var myEntry = Locations.findOne({"UID": userID});
+            var userArray = Locations.find({
+                'UID': {
+                    $ne: userID
+                }
             });
-        });
-        //Create a distlist property for the current user
-        Locations.update({
-            "_id": myEntry._id
-        }, {
-            //Should change this to only update the entries in the distList that need to be updated
-            $set: {
-                'distList': distList
-            }
-        });
-        
+            //For each user document in the DB that's not the current user
+            //Add their name, distance, and matched=false info to the distList array
+            userArray.forEach(function(user) {
+                distList.push({
+                    'UID': user.UID,
+                    'name': user.name,
+                    'distance': computeDist(myEntry.geo, user.geo),
+                    'matched': false,
+                    'lastActive': user.updated
+                });
+            });
+            //Create a distlist property for the current user
+            Locations.update({
+                "_id": myEntry._id
+            }, {
+                //Should change this to only update the entries in the distList that need to be updated
+                $set: {
+                    'distList': distList
+                }
+            });
+        } else {
+            console.log("Error: Cannot create distList. User mistmatch.");
+        }
     },
-    'locations.clearDistList' () {
-        var myEntry = Locations.findOne({"UID": Meteor.userId()});
+    'locations.clearDistList' (userID) {
+        if (userID === Meteor.userId()) {
+            var myEntry = Locations.findOne({"UID": Meteor.userId()});
 
-        Locations.update({
-            '_id': myEntry._id
-        }, {
-            $set: {
-                'distList': [] //Empty the distList
-            }            
-        });
+            Locations.update({
+                '_id': myEntry._id
+            }, {
+                $set: {
+                    'distList': [] //Empty the distList
+                }            
+            });
+        } else {
+            console.log("Error: Cannot clear DistList. User mismatch.");
+        }
     }
 });
 //Define the function so that the server can compute the distance

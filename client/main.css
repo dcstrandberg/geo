@@ -4,50 +4,106 @@ body {
     background-color: #eeeeee;
     margin: 0px;
     padding: 0px;
+    color: #000050;
+
 }
 #distance {
     width: 100%;
     height: auto;
     
-    position: absolute;
-    top: 60px;
+    position: relative;
+    top: 30px;
+    margin-bottom: 50px;
     
     overflow-y: auto;
     overflow-x: visible;
     
-    font-size: xx-large;
-    color: #000050;
     text-align: center;
     /*border: 2px solid red;*/
 }
-h1, h4 {
+#distance h1 {
     width: 100%;
+    font-size: 60px;
     margin: auto;
     
     /*border: 2px solid green;*/
 }
-#distance h3 {
-    text-align: left;
+@media screen and (max-width: 800px) {
+    #distance h1 {
+        font-size: 45px;
+    }
+    h3 {
+        font-size: 15px;
+    }
+}
+ul {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
 
-    margin: 0;
-    padding: 20px;
-    margin-left: 100px;
+    padding: 0; 
+    margin: 0;   
+    list-style-type: none;
+}
+ul#distList-container {
+    margin-bottom: 220px;
+    /*Thanks to this, when scrolled to the very bottom, the final entry will appear nicely above the buttons. Woohoo!*/
+}
+li.distList {
+    display: flex;
+    height: 80px;
+    justify-content: flex-start;
+    align-items: flex-end;
     
+    margin: 0px;
+    margin-left: 40px;
+    padding: 0px;
+    border-bottom: 2px solid #AAAAFA;
+   
     -webkit-transition: background-color 0.4s;
     -moz-transition: background-color 0.4s;
     transition: background-color 0.4s;
 }
-#distance ul {
-    list-style-type: none;
-    margin: 0;
+.distList input{
+    display: inline-flex;
+    margin: 10px 20px;
+    width: 20px;
+    height: 20px;
 }
+.distList h3 {
+    display: inline-flex;
+    font-size: 35px;
+    /*align-self: flex-end;*/
+    padding: 0px;
+    margin: 0px;
+    
+    margin-left: 0px;
+    margin-right: auto;
+}
+li.matched {
+    background-color: #FFCcA0;
+    border-bottom: 2px solid #BB4c30;
+}
+.matched h3 {
+    text-decoration: line-through;
+}
+last-updated {
+    display: inline-flex;
+    /*align-self: flex-end;*/
+    margin-left: auto;
+    margin-right: 60px;
 
+    text-decoration-line: none;
+    opacity: 0.8;
+    font-size: 16px;
+}
 #buttonbar {
     width: 100%;
     border-top: 3px solid #000050;
     display: flex;
     
-    position: absolute;
+    position: fixed;
     bottom: 0px;
     margin-top: 20px;
 }
@@ -73,21 +129,6 @@ button:hover {
 button.active {
     background-color: #BB4c30;
     color: #eeeeee;
-}
-.matched {
-    text-decoration: line-through;
-    background-color: #FFCcA0;
-    border-bottom: 2px solid #BB4c30;
-}
-last-updated {
-    display: inline-flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    margin-left: auto;
-    
-    /*text-align: right;*/
-    opacity: 0.8;
-    font-size: 12px;
 }
 /*login-buttons {
   

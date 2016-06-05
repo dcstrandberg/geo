@@ -21,7 +21,7 @@ class DistCtrl {
         this.on = false;
                 
         this.compassOff = function() {
-            if (vm.on === true) {//Only do a thing if we're currently On
+            if (vm.on === true && Meteor.userId()) {//Only do a thing if we're currently On & the user's logged in
                 //Use the service to clear the geo watch
                 distService.clearGeo();
                 vm.on = false;
@@ -29,10 +29,10 @@ class DistCtrl {
             }
         };
         this.compassOn = function() {
-            if (vm.on === false) {//Only do a thing if we're currently Off
+            if (vm.on === false && Meteor.userId()) {//Only do a thing if we're currently Off & the user's logged in
                 //Call the distService to get the geo Obj
                 //Pass it the username of the current user
-                distService.getGeo(); //PASS THE USERID INSTEAD OF vm.name
+                distService.getGeo(); 
             
                 //Update variables
                 vm.on = true; //I SHOULD MAKE THIS UPDATE ONCE I'M SURE THE DATABASE IS FRESH, OR I SHOULD NOT HAVE THE HELPERS FUNCTION DEPEND ON vm.on
@@ -81,7 +81,7 @@ class DistCtrl {
                     return "";
                 }*/
             },
-            loggedInUser() {//Only used right now to only show distances if the user's logged in
+            loggedInUser() {//Only used right now to show distances only if the user's logged in
                 return Meteor.user();
             } 
         });

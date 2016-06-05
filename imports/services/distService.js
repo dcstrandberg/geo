@@ -37,7 +37,7 @@ function DistService() {
         //When Off is clicked this method gets called
         this.clearGeo = () => {
             navigator.geolocation.clearWatch(watchID);
-            Meteor.call('locations.clearDistList');
+            Meteor.call('locations.clearDistList', Meteor.userId());
         };        
         
         
@@ -54,7 +54,7 @@ function DistService() {
                 }
             };
             Meteor.call('locations.setLocation', userObj);
-            createDistList(); 
+            createDistList();//EVERYTIME this gets called, it will update our distList. It should get called everytime OUR geolocation changes. So. there's that...
             return "";  
         }
         
