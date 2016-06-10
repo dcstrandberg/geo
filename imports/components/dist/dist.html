@@ -6,12 +6,12 @@
     <h1>{{$ctrl.error}}</h1>
 </div>
     
-<ul ng-repeat="currentUser in $ctrl.distances" ng-show="$ctrl.loggedInUser" id="distList-container">
-    <ul ng-repeat="user in currentUser.distList | orderBy:'distance'">
-        <li class="distList" ng-show="$ctrl.on" ng-class="{matched: user.matched}">
+<!--<ul ng-repeat="currentUser in $ctrl.distances" ng-show="$ctrl.loggedInUser" id="distList-container">-->
+    <ul ng-show="$ctrl.loggedInUser" id="distList-container">
+        <li ng-repeat="user in $ctrl.distances | orderBy:'distance'" class="distList" ng-show="$ctrl.on" ng-class="{matched: user.matched}">
             <input type="checkbox" 
                 ng-checked="user.matched"   
-                ng-click="$ctrl.matchUser(currentUser, user)"
+                ng-click="$ctrl.matchUser(user)"
             />
             <h3>
                 {{user.name}}: {{user.distance | number:1}} km 
@@ -19,7 +19,7 @@
             <last-updated updated="user.lastActive"></last-updated>
         </li>
     </ul>
-</ul>
+<!--</ul>-->
 
 <div id="buttonbar">
 <button id="on" ng-class="{active: $ctrl.on}" ng-click="$ctrl.compassOn()">On</button>

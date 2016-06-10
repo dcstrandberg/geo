@@ -10,7 +10,7 @@ if (Meteor.isServer) {
         return Locations.find({//I COULD MODIFY THIS SO THAT ONLY THE DISTLIST GETS PUBLISHED AND THEN THE CURRENT GEO OBJECT COULD JUST BE FED TO THE VIEW FROM THE DISTSERVICE INSTEAD OF FROM THE DB. THAT MIGHT BE SAFER SO THAT NEVER DOES THE CONTROLLER READ THE GEO OBJECT FROM THE DB. INSTEAD IT JUST GETS THE DISTANCES...
             UID: this.userId
         }/*,{
-            distList: true //This would only return the distList of the entyr, but currently we need the full entry, so I've commented it out
+            distList: 1 //This would only return the distList and _id of the entry, but currently we need the full entry for the me() helper, so I've commented it out
         }
         */);
         //Publish only the logged in user's entry
@@ -18,13 +18,13 @@ if (Meteor.isServer) {
 }
 
 Meteor.methods({
-    'locations.matchUser' (currentUser, userObj) {
+    'locations.matchUser' (/*currentUser,*/ userObj) {
         check(userObj, Object);
-        check(currentUser, Object);
+        /*check(currentUser, Object);*/
         //Only perform method if the user sending the request is the same one that's logged in. 
-        if (currentUser.UID === Meteor.userId()) {
+        if (Meteor.userId()) {
             Locations.update({
-                '_id': currentUser._id,
+                'UID': Meteor.userId(),
                 'distList.UID': userObj.UID
             }, { 
                 $set: {
@@ -33,7 +33,7 @@ Meteor.methods({
                 }
             });
         } else {
-            console.log("Error: Cannot Match User. You are not the current user.")
+            console.log("Error: Cannot Match User. Please log in.");
         }
     },
     'locations.setLocation' (userObj) {
@@ -68,7 +68,7 @@ Meteor.methods({
     'locations.createDistList' (userID) {
         check(userID, String);
         
-        if (userID === Meteor.userId()){//Make sure logged in user is the one we're generating the distList for. 
+        if (userID === Meteor.userId()) {//Make sure logged in user is the one we're generating the distList for. 
             var distList = []; 
             var myEntry = Locations.findOne({"UID": userID});
             var userArray = Locations.find({
@@ -76,28 +76,60 @@ Meteor.methods({
                     $ne: userID
                 }
             });
-            //For each user document in the DB that's not the current user
-            //Add their name, distance, and matched=false info to the distList array
+            
+            //Only want to update the user entries whose distances have changed
+            //Go through the array of other users first and check their 
+            //current distances against the current user's distList
             userArray.forEach(function(user) {
-                distList.push({
-                    'UID': user.UID,
-                    'name': user.name,
-                    'distance': computeDist(myEntry.geo, user.geo),
-                    'matched': false,
-                    'lastActive': user.updated
+                //First compute the current distance
+                var newDist = computeDist(myEntry.geo, user.geo);
+                
+                //FIXME: Need to include logic to only add users within X miles
+
+                //Then find if the user is already in the distList
+                var oldUser = myEntry.distList.find(function(distUser) {
+                    //Return true if the UIDs matched
+                    if (distUser.UID === user.UID) {
+                        return true;
+                    } else {
+                        return false;
+                    }   
                 });
-            });
-            //Create a distlist property for the current user
-            Locations.update({
-                "_id": myEntry._id
-            }, {
-                //Should change this to only update the entries in the distList that need to be updated
-                $set: {
-                    'distList': distList
+                if (oldUser) {//If the newUser's already in distList
+                    
+                    //Check if the distance has changed, and if so update the DB
+                    if (oldUser.distance !== newDist) {//FIXME: This should be where we check to see if the distance is still within the radius, and if not, we remove that user from distList
+                        Locations.update({
+                            '_id': myEntry._id,
+                            'distList.UID': user.UID
+                        }, {
+                            $set: {
+                                'distList.$.distance': newDist,
+                                'distList.$.lastActive': user.updated
+                            }
+                        });
+                    }
+                } else {//If the newUser isn't already added to distList
+                    //Add their name, distance, and matched=false info to the distList array
+                    
+                    Locations.update({
+                        '_id': myEntry._id,
+                    }, {
+                        $push: {
+                            'distList': {
+                                'UID': user.UID,
+                                'name': user.name,
+                                'distance': newDist,
+                                'matched': false,
+                                'lastActive': user.updated
+                            }
+                        }
+                    });   
                 }
             });
-        } else {
+        } else {//If the current user's not the one trying to modify distList
             console.log("Error: Cannot create distList. User mistmatch.");
+            throw new Meteor.Error('Cannot create distList. User mismatch.');
         }
     },
     'locations.clearDistList' (userID) {
@@ -114,7 +146,7 @@ Meteor.methods({
         } else {
             console.log("Error: Cannot clear DistList. User mismatch.");
         }
-    }
+    } 
 });
 //Define the function so that the server can compute the distance
 function computeDist(myGeo, userGeo) {

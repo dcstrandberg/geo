@@ -8,8 +8,8 @@ function DistService() {
         //var userId; //Getting rid of this because I'm just calling Meteor.userId() directly rather than getting it passed. I might even end up just calling it in the database methods...
         var distSettings = { //Settings for grabbing the geolocation obj
             enableHighAccuracy: true,
-            timeout: 4000,
-            maximumAge: 0
+            timeout: 20000, //Timeout of 20s
+            maximumAge: 0//Always fetch a new location
         };
         var watchID;
         
@@ -17,9 +17,6 @@ function DistService() {
  
         //When On is clicked, this method finds the geo obj
         this.getGeo = () => {
-            //First assign the name variable so we can use it in the callback functions
-            //userId = UID;
-            
             if (navigator.geolocation) {
                 //watchPosition returns an ID for clearing it later
                 watchID = navigator.geolocation.watchPosition(
@@ -28,7 +25,7 @@ function DistService() {
                     distSettings
                 );            
             } else {
-                //Again, the error needs to be some sort of return or DB write
+                //errMsg is updated when clearGeo is called
                 this.errMsg = "Error getting navigator.geolocation!";
                 console.log("Error generated when seeing if 'navigator.geolocation' exists");
             }

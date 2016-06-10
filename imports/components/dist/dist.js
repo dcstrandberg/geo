@@ -42,10 +42,10 @@ class DistCtrl {
             }
         };
         
-        this.matchUser = function(currentUser, user) {
+        this.matchUser = function(user) {
             //Add the matched property to the user in distList
             //Call a meteor method to do it server-side
-            Meteor.call('locations.matchUser', currentUser, user);
+            Meteor.call('locations.matchUser', user);
         };
         
         this.helpers({
@@ -73,15 +73,26 @@ class DistCtrl {
                     };
                 }
             },
-            distances() {//Use the Locations helper and the Me helper to compute distances
-               // if (vm.getReactively('on')) {
-                    return Locations.find({
-                        'UID': Meteor.userId()
+            distances() {//Call the Meteor method to get the distances from the DB
+                if (vm.getReactively('on')) {
+                   //return Meteor.call('locations.distances');
+                    if (!Meteor.userId()) {
+                        throw new Meteor.Error('Please Log In');
+                    } else {
+                        var distances = [];
+                        Locations.find({
+                            'UID': Meteor.userId()
+                        }, {
+                            '_id': 0,//Don't return _id
+                            'distList': 1//DO return distList
+                        }).forEach(function(list) {
+                            distances = list.distList;
                         });
-                        
-                /*} else {
+                        return distances;
+                    }
+                } else {
                     return "";
-                }*/
+                }
             },
             loggedInUser() {//Only used right now to show distances only if the user's logged in
                 return Meteor.user();

@@ -38,8 +38,12 @@ class LastUpdated {
                 return " hours ago";
             } else if ((sec/3600) >= 24 && (sec/3600/24) < 7) {
                 return " days ago";
-            } else {//If it's more than a week ago
-                return ""; //This will just display the date
+            } else if ((sec/3600/24) >= 7 && //If it's more than a week & if the current year is the same as the year of lastUpdated
+                ( $filter('date')(vm.updated, 'yyyy') === 
+                    $filter('date')(new Date(), 'yyyy') ) )  {
+                return $filter('date')(vm.updated, 'MMM d'); //This will just display the date w/o the year
+            } else {
+                return $filter('date')(vm.updated, 'MMM d yyyy'); //This will return the date w/ the year
             }
         }
         
@@ -53,13 +57,9 @@ class LastUpdated {
             } else if (sec >= 3600 && (sec/3600) < 24) {
                 return (sec/3600);//Return # of hours
             } else if ((sec/3600) >= 24 && (sec/3600/24) < 7) {
-                return ((sec/3600/24));
-            } else if ((sec/3600/24) >= 7 && //If it's more than a week & if the current year is the same as the year of lastUpdated
-                ( $filter('date')(vm.update, 'yyyy') === 
-                    $filter('date')(new Date(), 'yyyy') ) )  {
-                return $filter('date')(vm.updated, 'MMM d'); //This will just display the date w/o the year
-            } else {
-                return $filter('date')(vm.updated, 'MMM d yyyy'); //This will return the date w/ the year
+                return ((sec/3600/24));//Return # of days
+            } else {//If it's more than a week ago...
+                return ""; //then just let the suffix handle it
             }
         }
         
