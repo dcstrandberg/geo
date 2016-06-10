@@ -116,6 +116,7 @@ export default angular.module('dist', [
 ]).factory('distService', 
     DistService
 ).component('dist', {
-    templateUrl: 'imports/components/dist/dist.html',
+    template,
+    //templateUrl: 'imports/components/dist/dist.html',
     controller: ['$scope', 'distService', '$window', DistCtrl]
 });

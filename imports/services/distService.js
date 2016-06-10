@@ -1,11 +1,8 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
-//import { Locations } from '../api/locations.js';
-//I don't think we need this anymore since we just call the methods...
 
 function DistService() {
     var vm = this;
-        //var userId; //Getting rid of this because I'm just calling Meteor.userId() directly rather than getting it passed. I might even end up just calling it in the database methods...
         var distSettings = { //Settings for grabbing the geolocation obj
             enableHighAccuracy: true,
             timeout: 20000, //Timeout of 20s
@@ -52,21 +49,19 @@ function DistService() {
                 }
             };
             Meteor.call('locations.setLocation', userObj);
-            createDistList();//EVERYTIME this gets called, it will update our distList. It should get called everytime OUR geolocation changes. So. there's that...
+            createDistList();
             return "";  
         }
         
         function geoError(err) {
-            
-            //Perhaps it should write the error to the DB because that would be better?
-            
+            //Errors get updated here, and then they register in the view when Off is called
             console.log("Error registered in callback function:" + err.code + ": " + err.message);
             this.errMsg = "Error registered in callback function:" + err.code + ": " + err.message;
         }
         
         function createDistList() {
             //Call the Meteor Method to generate and write the distList
-            //Pass it with the parameter of the current user's name
+            //Pass it with the parameter of the current user's UID
             Meteor.call('locations.createDistList', Meteor.userId() );
             return "";
         }

@@ -70,7 +70,8 @@ class LastUpdated {
 export default angular.module('lastUpdated', [
     angularMeteor
 ]).component('lastUpdated', {
-    templateUrl: 'imports/components/lastUpdated/lastUpdated.html',
+    //templateUrl: 'imports/components/lastUpdated/lastUpdated.html',
+    template,
     controller: ['$scope', '$interval', '$filter', LastUpdated],
     bindings: {
         updated: '='
