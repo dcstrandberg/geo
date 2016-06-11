@@ -14,7 +14,9 @@
                 ng-click="$ctrl.matchUser(user)"
             />
             <h3>
-                {{user.name}}: {{user.distance | number:1}} km 
+                <a ui-sref="userDetails({ userId: user.UID })">
+                    {{user.name}}: {{user.distance | number:1}} km
+                </a> 
             </h3>                    
             <last-updated updated="user.lastActive"></last-updated>
         </li>

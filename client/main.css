@@ -72,12 +72,28 @@ li.distList {
     margin-left: 0px;
     margin-right: auto;
 }
+/*.distList:hover {
+    background-color: #AAAAFA
+} I DON'T LIKE THE HOVERING MECHANIC CURRENTLY AND IT WON'T MATTER ON PHONES ANYWAY*/
 li.matched {
-    background-color: #FFCcA0;
+    background-color: #FFCCA0;
     border-bottom: 2px solid #BB4c30;
 }
+/*li.matched:hover {
+    background-color: #FFCCA0;
+} SAME NOTE AS ABOVE ABOUT THE HOVER MECHANIC */
 .matched h3 {
     text-decoration: line-through;
+}
+a {
+    color: #000050;
+    text-decoration: none;
+}
+a:visited {
+    color: #000050;
+}
+a:hover, a:active {
+    color: #BB4c30;
 }
 last-updated {
     display: inline-flex;
@@ -150,7 +166,7 @@ button.active {
         font-size: 26px;
     }
     .distList h3 {
-        font-size: 20px;
+        font-size: 18px;
     }
     last-updated {
         font-size: 14px;

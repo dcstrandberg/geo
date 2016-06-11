@@ -1,6 +1,7 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
 import { Meteor } from 'meteor/meteor';
+import uiRouter from 'angular-ui-router';
 
 import lastUpdated from '../lastUpdated/lastUpdated.js';
 import { Locations } from '../../api/locations.js';
@@ -112,6 +113,7 @@ class DistCtrl {
 
 export default angular.module('dist', [
     angularMeteor,
+    uiRouter,
     lastUpdated.name
 ]).factory('distService', 
     DistService
@@ -119,4 +121,14 @@ export default angular.module('dist', [
     template,
     //templateUrl: 'imports/components/dist/dist.html',
     controller: ['$scope', 'distService', '$window', DistCtrl]
-});
+})
+    .config(['$stateProvider', config]);
+    
+function config($stateProvider) {
+    'ngInject';
+    $stateProvider
+        .state('geo', {
+            url: '/geo',
+            template: '<login-buttons></login-buttons><dist></dist>'
+        });
+}
